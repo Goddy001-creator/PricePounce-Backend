@@ -1,9 +1,13 @@
+import math
+
 from flask import Blueprint, jsonify, request
 
 from app.database.repositories import (
+    SORT_COLUMNS,
     get_all_products,
-    get_product_by_id,
     get_price_history,
+    get_product_by_id,
+    get_products_page,
     search_products,
 )
 
@@ -13,11 +17,53 @@ products_bp = Blueprint("products", __name__)
 
 @products_bp.route("/products", methods=["GET"])
 def products():
-    products = get_all_products()
+    page = request.args.get("page", type=int)
+
+    # No page parameter: return everything, as before
+    if page is None:
+        products = get_all_products()
+
+        return jsonify({
+            "products": products,
+            "count": len(products)
+        })
+
+    per_page = request.args.get("per_page", default=10, type=int)
+    sort = request.args.get("sort", default="updated")
+    order = request.args.get("order", default="desc").lower()
+    search = request.args.get("q", default="").strip() or None
+    store = request.args.get("store", default="").strip() or None
+
+    if page < 1:
+        return jsonify({"error": "Page must be 1 or higher"}), 400
+
+    if per_page < 1 or per_page > 100:
+        return jsonify({"error": "per_page must be between 1 and 100"}), 400
+
+    if sort not in SORT_COLUMNS:
+        return jsonify({
+            "error": f"sort must be one of: {', '.join(SORT_COLUMNS)}"
+        }), 400
+
+    if order not in ("asc", "desc"):
+        return jsonify({"error": "order must be asc or desc"}), 400
+
+    items, total = get_products_page(
+        page=page,
+        per_page=per_page,
+        search=search,
+        store=store,
+        sort=sort,
+        order=order,
+    )
 
     return jsonify({
-        "products": products,
-        "count": len(products)
+        "products": items,
+        "count": len(items),
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "total_pages": max(1, math.ceil(total / per_page)),
     })
 
 
