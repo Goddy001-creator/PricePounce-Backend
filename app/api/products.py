@@ -1,4 +1,5 @@
 import math
+from datetime import timedelta
 
 from flask import Blueprint, jsonify, request
 
@@ -10,6 +11,8 @@ from app.database.repositories import (
     get_products_page,
     search_products,
 )
+from app.security.plans import PLAN_LIMITS, limits_for
+from app.security.sessions import optional_session, utcnow
 
 
 products_bp = Blueprint("products", __name__)
@@ -88,11 +91,30 @@ def product_history(product_id):
             "error": "Product not found"
         }), 404
 
+    session = optional_session()
+    limits = limits_for(session) if session else PLAN_LIMITS["free"]
+    days = limits["history_days"]
+
     history = get_price_history(product_id)
+    limited = False
+
+    if days is not None:
+        cutoff = utcnow() - timedelta(days=days)
+        recent = [row for row in history if row["checked_at"] >= cutoff]
+        older = [row for row in history if row["checked_at"] < cutoff]
+
+        # Keep the price that was in effect at the start of the window
+        if older:
+            recent.insert(0, older[-1])
+
+        limited = len(older) > 1
+        history = recent
 
     return jsonify({
         "product_id": product_id,
-        "history": history
+        "history": history,
+        "history_days": days,
+        "history_limited": limited,
     })
 
 

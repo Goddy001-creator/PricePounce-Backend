@@ -6,5 +6,5 @@ health_bp = Blueprint("health", __name__)
 def health():
     return jsonify({
         "status": "ok",
-        "message": "PricePulse Backend is running"
+        "message": "PricePounce Backend is running"
     })
