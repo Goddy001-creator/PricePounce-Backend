@@ -26,7 +26,7 @@ def get_watchlist_products(user_id):
     with db() as cursor:
         cursor.execute(
             f"""
-            SELECT {PRODUCT_COLUMNS}, w.created_at AS added_at
+            SELECT {PRODUCT_COLUMNS}, w.created_at AS added_at, w.target_price
             FROM watchlist w
             JOIN products p ON p.id = w.product_id
             WHERE w.user_id = %s

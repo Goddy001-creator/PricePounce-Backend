@@ -521,13 +521,26 @@ def change_password():
 # ------------------------------------------- two-factor authentication
 
 @auth_bp.route("/security/2fa/setup", methods=["POST"])
-@limiter.limit("10 per hour")
+@limiter.limit("5 per hour")
 @login_required
 def two_factor_setup():
     user = repo.get_user_by_id(g.session["id"])
+    password = str(json_body().get("password") or "")
 
     if user["totp_enabled"]:
         return error("Two-factor authentication is already enabled.")
+
+    if (
+        not password
+        or len(password) > MAX_LENGTH
+        or not verify_password(password, user["password_hash"])
+    ):
+        audit(
+            "2fa_setup_bad_password",
+            actor_user_id=user["id"],
+            target_user_id=user["id"],
+        )
+        return error("Your password is incorrect.")
 
     secret = new_secret()
     repo.save_pending_totp(user["id"], encrypt_secret(secret))

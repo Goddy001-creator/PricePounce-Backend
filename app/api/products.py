@@ -36,6 +36,8 @@ def products():
     order = request.args.get("order", default="desc").lower()
     search = request.args.get("q", default="").strip() or None
     store = request.args.get("store", default="").strip() or None
+    category = request.args.get("category", default="").strip().lower() or None
+    brand = request.args.get("brand", default="").strip() or None
 
     if page < 1:
         return jsonify({"error": "Page must be 1 or higher"}), 400
@@ -51,6 +53,9 @@ def products():
     if order not in ("asc", "desc"):
         return jsonify({"error": "order must be asc or desc"}), 400
 
+    if (category and len(category) > 120) or (brand and len(brand) > 100):
+        return jsonify({"error": "Invalid filter"}), 400
+
     items, total = get_products_page(
         page=page,
         per_page=per_page,
@@ -58,6 +63,8 @@ def products():
         store=store,
         sort=sort,
         order=order,
+        category=category,
+        brand=brand,
     )
 
     return jsonify({

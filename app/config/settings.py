@@ -41,3 +41,5 @@ SMTP_FROM = os.getenv("SMTP_FROM", "")
 
 TOTP_ENCRYPTION_KEY = os.getenv("TOTP_ENCRYPTION_KEY", "")
 REQUIRE_LOGIN_FOR_DATA = _flag("REQUIRE_LOGIN_FOR_DATA")
+
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5000").rstrip("/")

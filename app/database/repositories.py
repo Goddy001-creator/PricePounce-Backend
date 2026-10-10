@@ -455,6 +455,8 @@ def get_products_page(
     store=None,
     sort="updated",
     order="desc",
+    category=None,
+    brand=None,
 ):
     column = SORT_COLUMNS.get(sort, "last_checked")
     direction = "ASC" if str(order).lower() == "asc" else "DESC"
@@ -470,6 +472,21 @@ def get_products_page(
     if store:
         conditions.append("LOWER(store_name) = LOWER(%s)")
         params.append(store)
+
+    if category:
+        # A parent category also includes everything in its sub-categories
+        conditions.append("""
+            category_id IN (
+                SELECT id FROM categories
+                WHERE slug = %s
+                   OR parent_id = (SELECT id FROM categories WHERE slug = %s)
+            )
+        """)
+        params.extend([category, category])
+
+    if brand:
+        conditions.append("LOWER(brand) = LOWER(%s)")
+        params.append(brand)
 
     where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
     offset = (page - 1) * per_page
@@ -499,7 +516,9 @@ def get_products_page(
                 rating,
                 review_count,
                 availability,
-                last_checked
+                last_checked,
+                brand,
+                category_id
             FROM products
             {where}
             ORDER BY {column} IS NULL, {column} {direction}, id ASC

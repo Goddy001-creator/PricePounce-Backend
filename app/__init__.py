@@ -17,14 +17,16 @@ def create_app():
         origins=[FRONTEND_URL],
         supports_credentials=True,
         allow_headers=["Content-Type", "X-CSRF-Token"],
-        methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+        methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     )
 
     limiter.init_app(app)
 
     from app.api.admin import admin_bp
+    from app.api.alerts import alerts_bp
     from app.api.analytics import analytics_bp
     from app.api.auth import auth_bp
+    from app.api.categories import categories_bp
     from app.api.health import health_bp
     from app.api.products import products_bp
     from app.api.watchlist import watchlist_bp
@@ -33,13 +35,16 @@ def create_app():
     # One switch (REQUIRE_LOGIN_FOR_DATA) decides if product data needs login
     products_bp.before_request(enforce_data_access)
     analytics_bp.before_request(enforce_data_access)
+    categories_bp.before_request(enforce_data_access)
 
     for blueprint in (
         health_bp,
         products_bp,
         analytics_bp,
+        categories_bp,
         auth_bp,
         watchlist_bp,
+        alerts_bp,
         admin_bp,
     ):
         app.register_blueprint(blueprint, url_prefix="/api")
@@ -61,7 +66,8 @@ def create_app():
         response.headers["Referrer-Policy"] = "no-referrer"
 
         if request.path.startswith(
-            ("/api/auth", "/api/account", "/api/watchlist", "/api/security", "/api/admin")
+            ("/api/auth", "/api/account", "/api/watchlist",
+             "/api/security", "/api/admin")
         ):
             response.headers["Cache-Control"] = "no-store"
 

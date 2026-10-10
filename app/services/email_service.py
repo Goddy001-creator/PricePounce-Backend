@@ -139,3 +139,31 @@ def send_account_exists_email(name, email):
         "Go to login",
         f"{FRONTEND_URL}/login",
     )
+
+def send_price_alert_email(name, email, items, unsubscribe_url):
+    lines = []
+
+    for item in items:
+        if item["kind"] == "target":
+            lines.append(
+                f"{item['name']} ({item['store']}) hit your target: "
+                f"₦{item['price']:,.0f} (target ₦{item['target']:,.0f})."
+            )
+        else:
+            lines.append(
+                f"{item['name']} ({item['store']}) dropped "
+                f"{item['percent']:.0f}%: ₦{item['old']:,.0f} → ₦{item['price']:,.0f}."
+            )
+
+    lines.append(f"Turn off these emails: {unsubscribe_url}")
+
+    count = len(items)
+
+    _send(
+        email,
+        f"{count} price alert{'s' if count != 1 else ''} on your watchlist",
+        name,
+        lines,
+        "View watchlist",
+        f"{FRONTEND_URL}/watchlist",
+    )
