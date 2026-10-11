@@ -43,3 +43,24 @@ TOTP_ENCRYPTION_KEY = os.getenv("TOTP_ENCRYPTION_KEY", "")
 REQUIRE_LOGIN_FOR_DATA = _flag("REQUIRE_LOGIN_FOR_DATA")
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5000").rstrip("/")
+
+WEEKLY_DIGEST_ENABLED = _flag("WEEKLY_DIGEST_ENABLED", "true")
+
+import os as _os
+
+# Safe to add even if some of these already exist
+BACKEND_URL = globals().get("BACKEND_URL") or _os.getenv(
+    "BACKEND_URL", "http://127.0.0.1:5000"
+)
+
+# 0 = scheduled scraping off (keep it off until you have a working data source)
+SCRAPE_INTERVAL_MINUTES = int(_os.getenv("SCRAPE_INTERVAL_MINUTES", "0"))
+SCRAPE_LIMIT = int(_os.getenv("SCRAPE_LIMIT", "60"))
+
+WEEKLY_DIGEST_ENABLED = _os.getenv("WEEKLY_DIGEST_ENABLED", "true").lower() in (
+    "1", "true", "yes", "on"
+)
+
+PAYSTACK_SECRET_KEY = _os.getenv("PAYSTACK_SECRET_KEY", "")
+PAYSTACK_PLAN_MONTHLY = _os.getenv("PAYSTACK_PLAN_MONTHLY", "")
+PAYSTACK_PLAN_YEARLY = _os.getenv("PAYSTACK_PLAN_YEARLY", "")

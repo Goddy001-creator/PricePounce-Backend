@@ -6,3 +6,5 @@ __pycache__/
 .vscode/
 products.csv
 test_alerts.py
+test_digest.py
+test_billing.py

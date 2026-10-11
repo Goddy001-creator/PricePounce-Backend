@@ -167,3 +167,51 @@ def send_price_alert_email(name, email, items, unsubscribe_url):
         "View watchlist",
         f"{FRONTEND_URL}/watchlist",
     )
+
+def send_weekly_digest_email(name, email, drops, rises, watching, unsubscribe_url):
+    lines = [
+        f"Here is how the {watching} product{'s' if watching != 1 else ''} "
+        "on your watchlist moved this week."
+    ]
+
+    if drops:
+        lines.append("Price drops:")
+
+        for item in drops:
+            lines.append(
+                f"• {item['name']} ({item['store']}): "
+                f"₦{item['old']:,.0f} → ₦{item['price']:,.0f} "
+                f"({abs(item['percent']):.0f}% lower)"
+            )
+    else:
+        lines.append("No price drops this week.")
+
+    if rises:
+        lines.append(
+            f"{rises} product{'s' if rises != 1 else ''} got more expensive."
+        )
+
+    lines.append(f"Turn off these emails: {unsubscribe_url}")
+
+    _send(
+        email,
+        "Your weekly PricePounce digest",
+        name,
+        lines,
+        "Open watchlist",
+        f"{FRONTEND_URL}/watchlist",
+    )
+
+def send_payment_email(name, email, plan_label, expires_at):
+    _send(
+        email,
+        "Welcome to PricePounce Pro",
+        name,
+        [
+            f"Your {plan_label} Pro payment was successful.",
+            f"Pro is active until {expires_at:%d %b %Y}.",
+            "Your plan renews automatically. You can cancel anytime from the Pro pop-up in the app.",
+        ],
+        "Open PricePounce",
+        FRONTEND_URL,
+    )

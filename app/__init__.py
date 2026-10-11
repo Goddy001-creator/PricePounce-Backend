@@ -28,6 +28,8 @@ def create_app():
     from app.api.auth import auth_bp
     from app.api.categories import categories_bp
     from app.api.health import health_bp
+    from app.api.pro import pro_bp
+    from app.api.billing import billing_bp
     from app.api.products import products_bp
     from app.api.watchlist import watchlist_bp
     from app.security.sessions import enforce_data_access
@@ -45,7 +47,9 @@ def create_app():
         auth_bp,
         watchlist_bp,
         alerts_bp,
-        admin_bp,
+        pro_bp,
+        billing_bp,
+        admin_bp
     ):
         app.register_blueprint(blueprint, url_prefix="/api")
 
