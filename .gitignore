@@ -8,3 +8,8 @@ products.csv
 test_alerts.py
 test_digest.py
 test_billing.py
+
+products.csv
+test_alerts.py
+test_digest.py
+test_billing.py

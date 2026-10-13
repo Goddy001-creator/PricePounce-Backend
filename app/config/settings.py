@@ -64,3 +64,14 @@ WEEKLY_DIGEST_ENABLED = _os.getenv("WEEKLY_DIGEST_ENABLED", "true").lower() in (
 PAYSTACK_SECRET_KEY = _os.getenv("PAYSTACK_SECRET_KEY", "")
 PAYSTACK_PLAN_MONTHLY = _os.getenv("PAYSTACK_PLAN_MONTHLY", "")
 PAYSTACK_PLAN_YEARLY = _os.getenv("PAYSTACK_PLAN_YEARLY", "")
+
+APP_ENV = _os.getenv("APP_ENV", "development").lower()
+IS_PRODUCTION = APP_ENV == "production"
+
+# How many reverse proxies sit in front of Flask (0 for local development)
+TRUSTED_PROXIES = int(_os.getenv("TRUSTED_PROXIES", "0"))
+
+# memory:// is fine for one process. Use redis://... in production.
+RATELIMIT_STORAGE_URI = _os.getenv("RATELIMIT_STORAGE_URI", "memory://")
+
+SENTRY_DSN = _os.getenv("SENTRY_DSN", "")
