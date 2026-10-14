@@ -151,11 +151,22 @@ def admin_required(view):
     return wrapper
 
 
+# Summary data the logged-out dashboard preview may read. Everything else
+# under /api/products and /api/analytics still needs a login.
+PUBLIC_PREVIEW_PATHS = {
+    "/api/analytics/summary",
+    "/api/analytics/stores",
+    "/api/analytics/last-update",
+    "/api/analytics/price-trends",
+}
+
+
 def enforce_data_access():
     """Used as a before_request hook on the products and analytics blueprints."""
     if (
         REQUIRE_LOGIN_FOR_DATA
         and request.method != "OPTIONS"
+        and request.path not in PUBLIC_PREVIEW_PATHS
         and load_session() is None
     ):
         return jsonify({"error": "Authentication required"}), 401

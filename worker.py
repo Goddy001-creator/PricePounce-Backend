@@ -9,7 +9,7 @@ logger = logging.getLogger("worker")
 
 
 def cleanup():
-    """Removes expired sessions and tokens and abandoned checkouts."""
+    """Removes expired sessions and tokens, abandoned checkouts and old security logs."""
     connection = create_connection()
 
     try:
@@ -21,6 +21,9 @@ def cleanup():
         cursor.execute(
             "DELETE FROM payments WHERE status = 'pending' "
             "AND created_at < NOW() - INTERVAL 7 DAY"
+        )
+        cursor.execute(
+            "DELETE FROM audit_log WHERE created_at < NOW() - INTERVAL 365 DAY"
         )
         connection.commit()
     finally:

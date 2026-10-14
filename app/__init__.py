@@ -47,6 +47,7 @@ def create_app():
     limiter.init_app(app)
 
     from app.api.account import account_bp
+    from app.api.account_delete import account_delete_bp
     from app.api.admin import admin_bp
     from app.api.alerts import alerts_bp
     from app.api.analytics import analytics_bp
@@ -54,6 +55,8 @@ def create_app():
     from app.api.billing import billing_bp
     from app.api.categories import categories_bp
     from app.api.health import health_bp
+    from app.api.preferences import preferences_bp
+    from app.api.preview import preview_bp
     from app.api.pro import pro_bp
     from app.api.products import products_bp
     from app.api.watchlist import watchlist_bp
@@ -75,6 +78,9 @@ def create_app():
         pro_bp,
         billing_bp,
         account_bp,
+        preferences_bp,
+        account_delete_bp,
+        preview_bp,
         admin_bp,
     ):
         app.register_blueprint(blueprint, url_prefix="/api")
