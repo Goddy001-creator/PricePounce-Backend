@@ -1,5 +1,4 @@
 import pandas as pd
-from sklearn.impute import SimpleImputer
 
 
 def preprocess_products(products):
@@ -11,12 +10,13 @@ def preprocess_products(products):
     if "rating" not in dataframe.columns:
         return products
 
-    imputer = SimpleImputer(strategy="mean")
+    ratings = pd.to_numeric(dataframe["rating"], errors="coerce")
+    average_rating = ratings.mean()
 
-    dataframe["rating"] = imputer.fit_transform(
-        dataframe[["rating"]]
-    ).ravel()
+    # No product has a rating at all, so there is nothing to fill in
+    if pd.isna(average_rating):
+        return products
 
-    dataframe["rating"] = dataframe["rating"].round(1)
+    dataframe["rating"] = ratings.fillna(average_rating).round(1)
 
     return dataframe.to_dict(orient="records")
