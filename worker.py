@@ -2,6 +2,7 @@ import logging
 import time
 
 from app.database.connection import create_connection
+from app.services.rates import update_rates
 from app.services.scheduler import start_digest_scheduler, start_scheduler
 
 logging.basicConfig(level=logging.INFO)
@@ -40,5 +41,10 @@ if __name__ == "__main__":
             cleanup()
         except Exception:
             logger.exception("Cleanup failed")
+
+        try:
+            update_rates()
+        except Exception:
+            logger.exception("Currency rates update failed")
 
         time.sleep(6 * 60 * 60)

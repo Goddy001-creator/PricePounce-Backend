@@ -59,6 +59,7 @@ def create_app():
     from app.api.preview import preview_bp
     from app.api.pro import pro_bp
     from app.api.products import products_bp
+    from app.api.rates import rates_bp
     from app.api.watchlist import watchlist_bp
     from app.security.sessions import enforce_data_access
 
@@ -81,6 +82,7 @@ def create_app():
         preferences_bp,
         account_delete_bp,
         preview_bp,
+        rates_bp,
         admin_bp,
     ):
         app.register_blueprint(blueprint, url_prefix="/api")
